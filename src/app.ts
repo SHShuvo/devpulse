@@ -1,7 +1,10 @@
-import express from "express";
-const app = express();
+import express, { type Application, type Request, type Response } from "express";
 
-app.get("/", (req, res) => {
+const app : Application = express();
+app.use(express.json());
+
+
+app.get("/", (req : Request, res : Response) => {
   res.send("Welcome to DevPulse");
 });
 
