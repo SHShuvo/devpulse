@@ -15,7 +15,7 @@ const createIssue = async (req: Request, res: Response) => {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: "Internal server error",
+            message: error instanceof Error ? error.message : "Internal server error",
         });
     }
 };
@@ -34,7 +34,26 @@ const getIssues = async (req: Request, res: Response) => {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: "Internal server error",
+            message: error instanceof Error ? error.message : "Internal server error",
+        });
+    }
+}
+
+const getIssueById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await issuesService.getIssueByIdFromDB(id as string);
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Issue retrieved successfully",
+            data: result,
+        });
+    } catch (error) {
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: error instanceof Error ? error.message : "Internal server error",
         });
     }
 }
@@ -42,4 +61,5 @@ const getIssues = async (req: Request, res: Response) => {
 export const issuesController = {
     createIssue,
     getIssues,
+    getIssueById
 };
