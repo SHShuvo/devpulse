@@ -2,13 +2,13 @@ import { pool } from "../../db";
 import type { IIssue } from "./issue.interface";
 
 const createIssueIntoDB = async (payload: IIssue, reporter_id: number) => {
-    const { title, description, type, status } = payload;
+    const { title, description, type } = payload;
 
     const result = await pool.query(
-        `INSERT INTO issues (title, description, type, status, reporter_id)
-        VALUES ($1, $2, $3, COALESCE($4, 'open'), $5)
+        `INSERT INTO issues (title, description, type, reporter_id)
+        VALUES ($1, $2, $3, $4)
         RETURNING *`,
-        [title, description, type, status, reporter_id],
+        [title, description, type, reporter_id],
     );
     return result;
 };
@@ -124,10 +124,34 @@ const getIssueByIdFromDB = async (id: string) => {
     };
     return data;
 }
+
+const updateIssueInDB = async (id: string, payload: IIssue, user: any) => {
+    const { title, description, type } = payload;
+    if(user.role !== "maintainer") {
+        const existingIssue = await getIssueByIdFromDB(id);
+        if(existingIssue.reporter?.id !== user.id || existingIssue.status !== "open") {
+            throw new Error("Unauthorized to update this issue");
+        }
+    }
+
+    const result = await pool.query(
+        `UPDATE issues 
+        SET title = COALESCE($1, title),
+            description = COALESCE($2, description),
+            type = COALESCE($3, type),
+            updated_at = NOW()
+        WHERE id = $4
+        RETURNING *`,
+        [title, description, type, id],
+    );  
+
+    return result;
+}
     
 
 export const issuesService = {
     createIssueIntoDB,
     getAllIssuesFromDB,
-    getIssueByIdFromDB
+    getIssueByIdFromDB,
+    updateIssueInDB,
 };  

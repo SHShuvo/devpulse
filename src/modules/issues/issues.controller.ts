@@ -49,7 +49,8 @@ const getIssueById = async (req: Request, res: Response) => {
             message: "Issue retrieved successfully",
             data: result,
         });
-    } catch (error) {
+    } 
+    catch (error) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
@@ -58,8 +59,29 @@ const getIssueById = async (req: Request, res: Response) => {
     }
 }
 
+const updateIssue = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result =await issuesService.updateIssueInDB(id as string, req.body, req.user);
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Issue updated successfully",
+            data: result.rows[0],
+        });
+    } 
+    catch (error) {
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: error instanceof Error ? error.message : "Internal server error",
+        });
+    }
+};
+
 export const issuesController = {
     createIssue,
     getIssues,
-    getIssueById
+    getIssueById,
+    updateIssue
 };
