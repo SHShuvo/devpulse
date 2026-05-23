@@ -38,3 +38,4 @@ Thumbs.db
 
 # optional: uploads (if you store files locally)
 /uploads
+.vercel
