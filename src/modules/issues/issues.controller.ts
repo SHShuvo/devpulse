@@ -20,6 +20,26 @@ const createIssue = async (req: Request, res: Response) => {
     }
 };
 
+const getIssues = async (req: Request, res: Response) => {
+    try {
+        const { type, status, sort } = req.query;
+        const result = await issuesService.getAllIssuesFromDB(req.query);
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Issues retrieved successfully",
+            data: result,
+        });
+    } catch (error) {
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Internal server error",
+        });
+    }
+}
+
 export const issuesController = {
     createIssue,
+    getIssues,
 };
